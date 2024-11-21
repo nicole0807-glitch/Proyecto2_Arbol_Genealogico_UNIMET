@@ -45,3 +45,7 @@ public class Arbol {
         }
     }
 }
+        public NodoArbol buscarMiembro(String apodo) {
+            return buscarNodoPorMote(raiz, apodo);
+    }
+
