@@ -31,7 +31,7 @@ public class Arbol {
         }
     }
 
-      private void agregarDescendiente(NodoArbol padre, NodoArbol hijo) {
+    private void agregarDescendiente(NodoArbol padre, NodoArbol hijo) {
         if (padre.hijos == null) {
             padre.hijos = new NodoArbol[1];
             padre.hijos[0] = hijo;
@@ -44,28 +44,28 @@ public class Arbol {
             padre.hijos = nuevoArray;
         }
     }
-}
-        public NodoArbol buscarMiembro(String apodo) {
-            return buscarNodoPorMote(raiz, apodo);
+
+    public NodoArbol buscarMiembro(String apodo) {
+        return buscarNodoPorMote(raiz, apodo);
     }
 
-        private NodoArbol buscarNodoPorMote(NodoArbol nodo, String apodo) {
-                if (nodo == null) {
-                    return null;
+    private NodoArbol buscarNodoPorMote(NodoArbol nodo, String apodo) {
+        if (nodo == null) {
+            return null;
+        }
+        if (nodo.mote.equals(apodo)) {
+            return nodo;
+        }
+        if (nodo.hijos != null) {
+            for (int i = 0; i < nodo.hijos.length; i++) {
+                NodoArbol resultado = buscarNodoPorMote(nodo.hijos[i], apodo);
+                if (resultado != null) {
+                    return resultado;
                 }
-                if (nodo.mote.equals(apodo)) {
-                    return nodo;
-                }
-                if (nodo.hijos != null) {
-                    for (int i = 0; i < nodo.hijos.length; i++) {
-                        NodoArbol resultado = buscarNodoPorMote(nodo.hijos[i], apodo);
-                        if (resultado != null) {
-                            return resultado;
-                        }
-                    }
-                }
-                return null;
             }
+        }
+        return null;
+    }
 
     public void mostrarEstructura() {
         mostrarEstructuraRecursivo(raiz, 0);
