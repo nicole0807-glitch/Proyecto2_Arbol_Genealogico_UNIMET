@@ -6,7 +6,7 @@ package proyecto2;
 
 /**
  *
- * @author Nicole
+ * @author kelly
  */
 public class HashTable {
 
@@ -27,7 +27,6 @@ public class HashTable {
         return nobleza;
     }
 
-
     public void setNobleza(NodoArbol[] nobleza) {
         this.nobleza = nobleza;
     }
@@ -39,7 +38,7 @@ public class HashTable {
     public void setSize(int size) {
         this.size = size;
     }
-    
+
     public int getCount() {
         return count;
     }
@@ -47,7 +46,6 @@ public class HashTable {
     public void setCount(int count) {
         this.count = count;
     }
-
 
     public int hash(String mote) {
         int hash = 0;
@@ -57,31 +55,28 @@ public class HashTable {
         return hash % this.getSize();
     }
 
-    public void insertar(NodoArbol noble) {
-        int hash = this.hash(noble.mote.toLowerCase());
-        if (this.getNobleza()[hash] == noble) {
+    public void insertar(String clave, NodoArbol nodo) {
+        int hash = this.hash(clave.toLowerCase());
+        if (this.getNobleza()[hash] == nodo) {
             return;
-        }
-        else if(this.getNobleza()[hash] == null){
-            this.getNobleza()[hash] = noble;
-        }
-        else if (this.getCount() == this.getSize()) {
-            this.agrandarArreglo(noble);
+        } else if (this.getNobleza()[hash] == null) {
+            this.getNobleza()[hash] = nodo;
+        } else if (this.getCount() == this.getSize()) {
+            this.agrandarArreglo(clave, nodo);
         } else {
-            while(this.getNobleza()[hash] != null){
-                if(hash == this.getSize() -1){
+            while (this.getNobleza()[hash] != null) {
+                if (hash == this.getSize() - 1) {
                     hash = 0;
-                }
-                else{
-                    hash ++;
+                } else {
+                    hash++;
                 }
             }
-            this.getNobleza()[hash] = noble;
-            
+            this.getNobleza()[hash] = nodo;
+
         }
     }
 
-    public void agrandarArreglo(NodoArbol noble) {
+    public void agrandarArreglo(String clave, NodoArbol noble) {
         NodoArbol[] anterior = this.nobleza;
         this.nobleza = new NodoArbol[this.getSize() * 2];
         for (int i = 0; i < this.getSize(); i++) {
@@ -89,13 +84,24 @@ public class HashTable {
         }
         int tamaño = this.getSize();
         this.setSize(this.getSize() * 2);
-        for (int i = 0; i < tamaño; i++) {
-            NodoArbol aux = anterior[i];
-            this.insertar(aux);
+
+        if (noble.nombre.toLowerCase().equals(clave.toLowerCase())) {
+            for (int i = 0; i < tamaño; i++) {
+                NodoArbol aux = anterior[i];
+
+                this.insertar(aux.nombre, aux);
+            }
+        }
+        if (noble.mote.toLowerCase().equals(clave.toLowerCase())) {
+            for (int i = 0; i < tamaño; i++) {
+                NodoArbol aux = anterior[i];
+
+                this.insertar(aux.mote, aux);
+            }
         }
 
-        int hash = this.hash(noble.mote.toLowerCase());
-        this.insertar(noble);
+        int hash = this.hash(clave.toLowerCase());
+        this.insertar(clave, noble);
     }
 
     public NodoArbol buscar(String mote) {
@@ -104,24 +110,59 @@ public class HashTable {
             return this.getNobleza()[hash];
         } else {
             int contador = 0;
-            while(true){
-                if(contador == this.size){
+            while (true) {
+                if (contador == this.size) {
                     return null;
                 }
-                if(this.getNobleza()[hash] != null && this.getNobleza()[hash].mote.toLowerCase().equals(mote.toLowerCase())){
+                if (this.getNobleza()[hash] != null && this.getNobleza()[hash].mote.toLowerCase().equals(mote.toLowerCase())) {
                     return this.getNobleza()[hash];
                 }
-                if(hash == this.getSize() -1){
+                if (hash == this.getSize() - 1) {
                     hash = 0;
-                }
-                else{
-                    hash ++;
+                } else {
+                    hash++;
                 }
                 contador++;
             }
         }
     }
 
+    public NodoArbol buscarPorNombre(String nombre) {
+        int hash = this.hash(nombre.toLowerCase());
+        if (this.getNobleza()[hash].nombre.toLowerCase().equals(nombre.toLowerCase())) {
+            return this.getNobleza()[hash];
+        } else {
+            int contador = 0;
+            while (true) {
+                if (contador == this.size) {
+                    return null;
+                }
+                if (this.getNobleza()[hash] != null && this.getNobleza()[hash].nombre.toLowerCase().equals(nombre.toLowerCase())) {
+                    return this.getNobleza()[hash];
+                }
+                if (hash == this.getSize() - 1) {
+                    hash = 0;
+                } else {
+                    hash++;
+                }
+                contador++;
+            }
+        }
+    }
 
+//    public NodoArbol[] buscarPorTitulo(String titulo) {
+//        NodoArbol[] tenedores = new NodoArbol[this.size];
+//        int index = 0;
+//        int hash = 0;
+//        while (hash != this.size) {
+//            if (this.getNobleza()[hash] != null && this.getNobleza()[hash].heldTitle.toLowerCase().equals(titulo.toLowerCase())) {
+//                tenedores[index] = this.getNobleza()[hash];
+//                index += 1;
+//            }
+//
+//                hash++;           
+//        }
+//        return tenedores;
+//    }
 
 }
