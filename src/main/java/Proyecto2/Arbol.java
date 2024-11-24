@@ -85,55 +85,70 @@ public class Arbol {
         }
     }
 
-    public void mostrarAntepasados(String apodo) {
+    public NodoArbol[] mostrarAntepasados(String apodo) {
+        NodoArbol[] tenedores = new NodoArbol[100];
         NodoArbol miembro = buscarMiembro(apodo);
         if (miembro != null) {
-            mostrarAntepasadosRecursivo(miembro);
+            mostrarAntepasadosRecursivo(miembro, tenedores, 0);
         } else {
             System.out.println("Miembro no encontrado.");
         }
+        return tenedores;
     }
 
-    private void mostrarAntepasadosRecursivo(NodoArbol nodo) {
+    private NodoArbol[] mostrarAntepasadosRecursivo(NodoArbol nodo, NodoArbol[] tenedores, int index) {
         if (nodo != null) {
             if (nodo.bornTo != null) {
                 System.out.println(nodo.bornTo.ofHisName);
-                mostrarAntepasadosRecursivo(nodo.bornTo);
+                tenedores[index] = nodo;
+                tenedores = mostrarAntepasadosRecursivo(nodo.bornTo, tenedores, index +1);
             }
         }
+        return tenedores;
     }
 
-    public void buscarPorCargo(String cargo) {
-        buscarPorCargoRecursivo(raiz, cargo);
+    public NodoArbol[] buscarPorCargo(String cargo) {
+                NodoArbol[] tenedores = new NodoArbol[100];
+        return buscarPorCargoRecursivo(raiz, cargo, tenedores, 0);
     }
 
-    private void buscarPorCargoRecursivo(NodoArbol nodo, String cargo) {
+    private NodoArbol[] buscarPorCargoRecursivo(NodoArbol nodo, String cargo, NodoArbol[] tenedores, int index ) {
         if (nodo != null) {
             if (nodo.heldTitle.equals(cargo)) {
                 System.out.println(nodo.ofHisName);
+                tenedores[index] = nodo;
             }
             if (nodo.hijos != null) {
                 for (NodoArbol hijo : nodo.hijos) {
-                    buscarPorCargoRecursivo(hijo, cargo);
+                    index += 1;
+                    tenedores = buscarPorCargoRecursivo(hijo, cargo, tenedores, index);
                 }
             }
         }
+        return tenedores;
     }
 
-    public void listarGeneracionEspecifica(int generacion) {
-        listarGeneracionRecursivo(raiz, generacion, 0);
+    public NodoArbol[] listarGeneracionEspecifica(int generacion) {
+                NodoArbol[] tenedores = new NodoArbol[100];
+        return listarGeneracionRecursivo(raiz, generacion, 0, tenedores, 0);
     }
 
-    private void listarGeneracionRecursivo(NodoArbol nodo, int generacion, int nivel) {
+    private NodoArbol[] listarGeneracionRecursivo(NodoArbol nodo, int generacion, int nivel, NodoArbol[] tenedores, int index) {
+
+
         if (nodo != null) {
             if (nivel == generacion) {
                 System.out.println(nodo.ofHisName);
+                tenedores[index] = nodo;
+
             }
             if (nodo.hijos != null) {
                 for (NodoArbol hijo : nodo.hijos) {
-                    listarGeneracionRecursivo(hijo, generacion, nivel + 1);
+                    index ++;
+                    tenedores = listarGeneracionRecursivo(hijo, generacion, nivel + 1, tenedores, index);
                 }
             }
         }
+        return tenedores;
     }
 }
