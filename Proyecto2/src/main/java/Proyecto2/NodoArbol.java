@@ -30,3 +30,24 @@ public class NodoArbol {
     
     
 }
+    // Método para obtener todos los datos del nodo como un String
+    public String obtenerDatosNodo() {
+        StringBuilder datos = new StringBuilder();
+        
+        // Atributos obligatorios
+        datos.append("Nombre: ").append(nombre != null ? nombre : "Desconocido").append("\n");
+        datos.append("De su nombre: ").append(ofHisName != null ? ofHisName : "Desconocido").append("\n");
+        datos.append("Ojos: ").append(ofEyes != null ? ofEyes : "Desconocido").append("\n");
+        datos.append("Cabello: ").append(ofHair != null ? ofHair : "Desconocido").append("\n");
+        
+        // Atributos opcionales
+        datos.append("Mote: ").append(mote != null ? mote : "Desconocido").append("\n");
+        datos.append("Título: ").append(heldTitle != null ? heldTitle : "Desconocido").append("\n");
+        datos.append("Esposa: ").append(wedTo != null ? wedTo : "Desconocido").append("\n");
+        datos.append("Notas: ").append(notes != null ? notes : "Desconocido").append("\n");
+        datos.append("Destino: ").append(fate != null ? fate : "Desconocido").append("\n");
+        
+        return datos.toString();
+    }
+}
+}
