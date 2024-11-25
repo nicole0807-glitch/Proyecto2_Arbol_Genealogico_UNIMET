@@ -10,7 +10,7 @@ package proyecto2;
  */
 public class HashTable {
 
-    private NodoArbol[] nobleza;
+    public NodoArbol[] nobleza;
     private int size;
     private int count;
 
@@ -129,7 +129,11 @@ public class HashTable {
 
     public NodoArbol buscarPorNombre(String nombre) {
         int hash = this.hash(nombre.toLowerCase());
-        if (this.getNobleza()[hash].nombre.toLowerCase().equals(nombre.toLowerCase())) {
+        String[] separado = nombre.split(",");
+        
+        if (this.getNobleza()[hash] != null && this.getNobleza()[hash].nombre.trim().toLowerCase().equals(separado[0].trim().toLowerCase()) && separado[1].trim().toLowerCase().contains(this.getNobleza()[hash].ofHisName.trim().toLowerCase()) ) {
+            System.out.println("ENCONTRADO");
+            
             return this.getNobleza()[hash];
         } else {
             int contador = 0;
@@ -137,7 +141,7 @@ public class HashTable {
                 if (contador == this.size) {
                     return null;
                 }
-                if (this.getNobleza()[hash] != null && this.getNobleza()[hash].nombre.toLowerCase().equals(nombre.toLowerCase())) {
+                if (this.getNobleza()[hash] != null && this.getNobleza()[hash].nombre.trim().toLowerCase().equals(separado[0].trim().toLowerCase()) && separado[1].trim().toLowerCase().contains(this.getNobleza()[hash].nombre.trim().toLowerCase()) ) {
                     return this.getNobleza()[hash];
                 }
                 if (hash == this.getSize() - 1) {
@@ -149,20 +153,22 @@ public class HashTable {
             }
         }
     }
+    
+    public void insertarEnHashTable(Arbol arbol) {
+        insertarEnHashTableRecursivo(arbol.raiz);
+    }
 
-//    public NodoArbol[] buscarPorTitulo(String titulo) {
-//        NodoArbol[] tenedores = new NodoArbol[this.size];
-//        int index = 0;
-//        int hash = 0;
-//        while (hash != this.size) {
-//            if (this.getNobleza()[hash] != null && this.getNobleza()[hash].heldTitle.toLowerCase().equals(titulo.toLowerCase())) {
-//                tenedores[index] = this.getNobleza()[hash];
-//                index += 1;
-//            }
-//
-//                hash++;           
-//        }
-//        return tenedores;
-//    }
+    private void insertarEnHashTableRecursivo(NodoArbol nodo) {
+        if (nodo != null) {
+            // Insertamos el nodo en la tabla hash usando su mote como clave
+            this.insertar(nodo.nombre + ", " + nodo.ofHisName + " of His Name", nodo);
 
+            // Recorrer los hijos
+            if (nodo.hijos != null) {
+                for (NodoArbol hijo : nodo.hijos) {
+                    insertarEnHashTableRecursivo(hijo);
+                }
+            }
+        }
+    }
 }
