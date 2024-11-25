@@ -22,21 +22,30 @@ import org.graphstream.ui.view.ViewerPipe;
 
 /**
  *
- * @author andre
+ * @author kelly
+ */
+
+/**
+ * Clase que representa la visualización de un árbol genealógico utilizando GraphStream.
  */
 public class GraphStream2 extends javax.swing.JFrame implements ViewerListener {
 
     private static NodoArbol[] tree;
-
-    /**
-     * Creates new form GraphStream2
-     */
+    public static Arbol arbol;
     private Graph graph;
     private final ViewerPipe fromViewer;
 
-    public GraphStream2(NodoArbol[] tree) {
+    /**
+     * Constructor de la clase GraphStream2.
+     * 
+     * @param tree Un arreglo de nodos que representan el árbol genealógico.
+     * @param arbol La estructura de árbol que se va a visualizar.
+     */
+    public GraphStream2(NodoArbol[] tree, Arbol arbol) {
+        this.arbol = arbol;
         this.tree = tree;
         initComponents();
+        this.setVisible(true);
         this.setLocationRelativeTo(null);
         graph = new SingleGraph("ARBOL FAMILIAR");
 
@@ -50,19 +59,37 @@ public class GraphStream2 extends javax.swing.JFrame implements ViewerListener {
         GraphStreamPanel.requestFocusInWindow();
         GraphStreamPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         fromViewer = viewer.newViewerPipe();
-        fromViewer.addViewerListener((ViewerListener) this);
+        fromViewer.addViewerListener(this);
         fromViewer.addSink(graph);
-        
-        
-        for (NodoArbol nodo : this.tree) {
-            populateGraph(nodo, 0, 0);  // Cambié tree.root a tree.getRaiz()
 
+        int offsetX = 100; // Espacio entre nodos en el eje X
+        int offsetY = 100; // Espacio entre nodos en el eje Y
+        int x = 0; // Coordenada inicial X
+        int y = 0; // Coordenada inicial Y
+
+        for (NodoArbol nodo : tree) {
+            if (nodo != null) {
+                populateGraph(nodo, x, y, null);  // Cambié tree.root a tree.getRaiz()
+                x += offsetX; // Incrementar la posición X para el siguiente nodo
+                if (x > 2000) { // Si llegamos a un cierto límite, mover a la siguiente fila
+                    x = 0; // Reiniciar X
+                    y += offsetY; // Incrementar Y para la siguiente fila
+                }
+            }
         }
 
         PumpViewer();
     }
 
-    private void populateGraph(NodoArbol nodo, int x, int y) {
+    /**
+     * Población del grafo a partir de un nodo del árbol.
+     * 
+     * @param nodo El nodo actual del árbol.
+     * @param x La posición horizontal del nodo en la visualización.
+     * @param y La posición vertical del nodo en la visualización.
+     * @param padre El nodo padre del nodo actual.
+     */
+    private void populateGraph(NodoArbol nodo, int x, int y, NodoArbol padre) {
         if (nodo == null) {
             return;
         }
@@ -70,18 +97,20 @@ public class GraphStream2 extends javax.swing.JFrame implements ViewerListener {
         String clave = nodo.nombre + "/" + nodo.ofHisName;
         graph.addNode(clave);
         Node node = graph.getNode(clave);
-//        node.setAttribute("xyz", x, y, 1);
-        node.setAttribute("ui.label", nodo.nombre);
-        node.setAttribute("ui.style", "fill-color: gray; size: 45px; stroke-width: 2px;");
+        node.setAttribute("ui.label", nodo.nombre + ", " + nodo.ofHisName + " of his name");
+        node.setAttribute("ui.style", "fill-color: pink; size: 45px; stroke-width: 2px;");
         node.setAttribute("ui.clickable", true);
+        node.setAttribute("xyz", x, y, 0); // Establecer la posición del nodo
 
-        if (nodo.bornTo != null) {
-            String clavePadre = nodo.bornTo.nombre + "/" + nodo.bornTo.ofHisName;
+        if (padre != null) {
+            String clavePadre = padre.nombre + "/" + padre.ofHisName;
             graph.addEdge(clavePadre + "-" + clave, clavePadre, clave);
         }
-
     }
 
+    /**
+     * Inicia el proceso de actualización del visualizador en un hilo separado.
+     */
     private void PumpViewer() {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
@@ -100,32 +129,37 @@ public class GraphStream2 extends javax.swing.JFrame implements ViewerListener {
         worker.execute();
     }
 
+    @Override
     public void viewClosed(String id) {
         // Implementar lógica si es necesario
     }
 
+    @Override
     public void buttonPushed(String id) {
-        System.out.println("Botón presionado: " + id);
         Node node = graph.getNode(id);
         if (node != null) {
             String nombre = (String) node.getAttribute("ui.label");
-            JOptionPane.showMessageDialog(this, "Has hecho clic en el nodo: " + nombre);
+            JOptionPane.showMessageDialog(this, "Datos: " + arbol.buscarNodoPorNombreCompleto(arbol.raiz, nombre).obtenerDatosNodo());
         } else {
             System.out.println("El nodo no se encontró: " + id);
         }
     }
 
+    @Override
     public void buttonReleased(String string) {
         // Implementar lógica si es necesario
     }
 
+    @Override
     public void mouseOver(String string) {
         // Implementar lógica si es necesario
     }
 
+    @Override
     public void mouseLeft(String string) {
         // Implementar lógica si es necesario
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -145,14 +179,14 @@ public class GraphStream2 extends javax.swing.JFrame implements ViewerListener {
         GraphStreamPanel.setLayout(GraphStreamPanelLayout);
         GraphStreamPanelLayout.setHorizontalGroup(
             GraphStreamPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 614, Short.MAX_VALUE)
+            .addGap(0, 1220, Short.MAX_VALUE)
         );
         GraphStreamPanelLayout.setVerticalGroup(
             GraphStreamPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 443, Short.MAX_VALUE)
+            .addGap(0, 730, Short.MAX_VALUE)
         );
 
-        getContentPane().add(GraphStreamPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+        getContentPane().add(GraphStreamPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1220, 730));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -187,7 +221,7 @@ public class GraphStream2 extends javax.swing.JFrame implements ViewerListener {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new GraphStream2(tree).setVisible(true);
+                new GraphStream2(tree, arbol).setVisible(true);
             }
         });
     }

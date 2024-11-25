@@ -26,12 +26,21 @@ import org.graphstream.ui.view.ViewerPipe;
  *
  * @author kelly
  */
+
+/**
+ * Clase que representa la visualización de un árbol genealógico utilizando GraphStream.
+ */
 public class GraphStream extends JFrame implements ViewerListener {
 
     private static Arbol tree;
     private Graph graph;
     private final ViewerPipe fromViewer;
 
+    /**
+     * Constructor de la clase GraphStream.
+     * 
+     * @param tree El árbol genealógico que se va a visualizar.
+     */
     public GraphStream(Arbol tree) {
         this.tree = tree;
         initComponents();
@@ -56,38 +65,52 @@ public class GraphStream extends JFrame implements ViewerListener {
         PumpViewer();
     }
 
+    /**
+     * Población del grafo a partir de un nodo del árbol.
+     * 
+     * @param nodo El nodo actual del árbol.
+     * @param x La posición horizontal del nodo en la visualización.
+     * @param y La posición vertical del nodo en la visualización.
+     */
     private void populateGraph(NodoArbol nodo, int x, int y) {
-    if (nodo == null) {
-        return;
-    }
+        if (nodo == null) {
+            return;
+        }
 
-    String clave = nodo.nombre + "/" + nodo.ofHisName;
-    graph.addNode(clave);
-    Node node = graph.getNode(clave);
-    node.setAttribute("xyz", x, y, 1);
-    node.setAttribute("ui.label", nodo.nombre);
-    node.setAttribute("ui.style", "fill-color: gray; size: 40px; stroke-width: 2px;");
-    node.setAttribute("ui.clickable", true);
+        String clave = nodo.nombre + "/" + nodo.ofHisName;
+        graph.addNode(clave);
+        Node node = graph.getNode(clave);
+        node.setAttribute("xyz", x, y, 1);
+        node.setAttribute("ui.label", nodo.nombre + ", " + nodo.ofHisName + " of his name");
+        node.setAttribute("ui.style", "fill-color: pink; size: 40px; stroke-width: 2px;");
+        node.setAttribute("ui.clickable", true);
 
-    // Conectar el nodo con su padre
-    if (nodo.bornTo != null) {
-        String clavePadre = nodo.bornTo.nombre + "/" + nodo.bornTo.ofHisName;
-        graph.addEdge(clavePadre + "-" + clave, clavePadre, clave);
-    }
+        // Conectar el nodo con su padre
+        if (nodo.bornTo != null) {
+            try {
+                String clavePadre = nodo.bornTo.nombre + "/" + nodo.bornTo.ofHisName;
+                graph.addEdge(clavePadre + "-" + clave, clavePadre, clave);
+            } catch (Exception e) {
+//                e.printStackTrace();
+            }
+        }
 
-    // Posicionar los hijos
-    if (nodo.hijos != null) {
-        int numHijos = nodo.hijos.length;
-        int childX = x - (numHijos * 50) / 2 + 25; // Ajustar el desplazamiento inicial
-        int childY = y - 100; // Distancia vertical a los hijos
+        // Posicionar los hijos
+        if (nodo.hijos != null) {
+            int numHijos = nodo.hijos.length;
+            int childX = x - (numHijos * 50) / 2 + 25; // Ajustar el desplazamiento inicial
+            int childY = y - 100; // Distancia vertical a los hijos
 
-        for (NodoArbol hijo : nodo.hijos) {
-            populateGraph(hijo, childX, childY);
-            childX += 50; // Espaciado horizontal entre hijos
+            for (NodoArbol hijo : nodo.hijos) {
+                populateGraph(hijo, childX, childY);
+                childX += 50; // Espaciado horizontal entre hijos
+            }
         }
     }
-}
 
+    /**
+     * Inicia el proceso de actualización del visualizador en un hilo separado.
+     */
     private void PumpViewer() {
         SwingWorker<Void, Void> worker = new SwingWorker<>() {
             @Override
@@ -113,11 +136,10 @@ public class GraphStream extends JFrame implements ViewerListener {
 
     @Override
     public void buttonPushed(String id) {
-        System.out.println("Botón presionado: " + id);
         Node node = graph.getNode(id);
         if (node != null) {
             String nombre = (String) node.getAttribute("ui.label");
-            JOptionPane.showMessageDialog(this, "Has hecho clic en el nodo: " + nombre);
+            JOptionPane.showMessageDialog(this, "Datos: " + tree.buscarNodoPorNombreCompleto(tree.raiz, nombre).obtenerDatosNodo());
         } else {
             System.out.println("El nodo no se encontró: " + id);
         }
@@ -138,6 +160,7 @@ public class GraphStream extends JFrame implements ViewerListener {
         // Implementar lógica si es necesario
     }
 
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -153,7 +176,7 @@ public class GraphStream extends JFrame implements ViewerListener {
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         GraphStreamPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        getContentPane().add(GraphStreamPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1180, 670));
+        getContentPane().add(GraphStreamPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1200, 700));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
